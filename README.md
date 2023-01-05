@@ -25,3 +25,4 @@ pip install -r requirements.txt
 
 # 待实现功能  <br>
 -模拟登录  <br>
+-查询小分  <br>
