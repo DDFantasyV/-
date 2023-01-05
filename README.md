@@ -4,6 +4,7 @@
 # 使用教程：  <br>
 
 ## 1.安装依赖
+直接下载程序到任一目录。
 创建**python虚拟环境**后，使用控制台终端cd到当前目录，使用以下代码进行依赖安装。  <br>
 ```
 pip install -r requirements.txt
