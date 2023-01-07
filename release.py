@@ -1,12 +1,64 @@
 import requests
 import json
 import pandas as pd
+import time
+import os
+from playwright.sync_api import sync_playwright
 
-url = 'https://jwgl.wvpn.hrbeu.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do'
-cookies = {'cookie_name': '请换成自己的cookie！'}
+'''
+os.remove('cookies.txt')
+os.remove('cookies.json')
+os.remove('data.json')
+os.remove('data.xlsx')
+'''
 
-response = requests.get(url, cookies=cookies)
-data = json.loads(response.text)
+url = 'https://jwgl.wvpn.hrbeu.edu.cn/jwapp/sys/cjcx/*default/index.do?EMAP_LANG=zh#/cjcx'
+
+with sync_playwright() as page:
+    browser = page.chromium.launch(headless=False, slow_mo=50)
+    page = browser.new_page()
+    context = browser.new_context()
+    page.goto(url)
+    time.sleep(30)
+    cookies = page.context.cookies()
+
+with open('cookies.json', 'w', encoding='utf-8') as fp:
+    json.dump(cookies, fp, ensure_ascii=False)
+
+with open('cookies.json', "r", encoding="utf-8") as n:
+    data = json.load(n)
+    for item in data:
+        name = item.get("name")
+        value = item.get("value")
+        if name == 'GS_SESSIONID':
+            session_id = value
+        if name == '_webvpn_key':
+            _webvpn_key = value
+        if name == 'webvpn_username':
+            webvpn_username = value
+        if name == '_WEU':
+            _WEU = value
+        if name == 'route':
+            route = value
+        if name == 'JSESSIONID':
+            JSESSIONID = value
+
+header = {
+    'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+ }
+
+cookie = {
+    '_WEU': _WEU,
+    '_ga': 'GA1.3.438918422.1667803941',
+    'route': route,
+    'JSESSIONID': JSESSIONID,
+    'GS_SESSIONID': session_id,
+    '_webvpn_key': _webvpn_key,
+    'webvpn_username': webvpn_username,
+}
+
+post = requests.post('https://jwgl.wvpn.hrbeu.edu.cn/jwapp/sys/cjcx/modules/cjcx/xscjcx.do', headers=header, cookies=cookie)
+data = json.loads(post.text)
 
 with open('data.json', 'w', encoding='utf-8') as fp:
     json.dump(data, fp, ensure_ascii=False)
